@@ -1,0 +1,124 @@
+Here are examples of rules that allow you to do the following:
+
+Set Default Homepage
+
+#Specify a default home page (index page)
+DirectoryIndex home.html
+Specify IP Access
+
+#Allow only specified IPs to access your site
+deny from all
+allow from 64.95.219.140
+allow from 210.23.45.67
+Redirect All Website Pages
+
+# Redirect all pages from olddomain.com
+# to newdomain.com
+Options +FollowSymLinks
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^www.olddomain.com$ [OR]
+RewriteCond %{HTTP_HOST} ^olddomain.com$
+RewriteRule ^(.*)$ http://www.newdomain.com/$1 [R=301,L]
+Prevent Sub-folder Access
+
+#Prevent subfolder loading. This goes
+# in htaccess for the primary domain
+RewriteCond %{HTTP_HOST} ^primary\.com$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.primary\.com$
+RewriteRule ^addon\.com\/?(.*)$ "http\:\/\/www\.addon\.com\/$1" [R=301,L]
+Prevent Sub-domain Access
+
+#Prevent subdomain name loading.
+#This goes in htaccess for the primary domain
+RewriteCond %{HTTP_HOST} ^subname\.primary\.com$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.subname\.primary\.com$
+RewriteRule ^(.*)$ "http\:\/\/www\.addon\.com\/$1" [R=301,L]
+Force Non-www Domain Access
+
+# Never use www in the domain
+# Replace 'example.com' with your domain name
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^www\.(([a-z0-9_]+\.)?example\.com)$ [NC]
+RewriteRule .? http://%1%{REQUEST_URI} [R=301,L]
+Force www Domain Access
+
+# Always use www in the domain
+# Replace 'example.com' with your domain name
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^([a-z.]+)?example\.com$ [NC]
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteRule .? http://www.%1example.com%{REQUEST_URI} [R=301,L]
+Set Default Home Folder
+
+# Set a default home directory, (this subfolder always loads)
+# Replace 'folder' with your subfolder name
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^$ /folder/ [R=301,L]
+</IfModule>
+Redirect Folder Access
+
+# Rename a directory and force visitors to the new name
+# Replace 'old' with your old folder name
+# Replace 'new' with your new folder name
+RewriteEngine on
+RewriteRule ^/?old([a-z/.]*)$ /new$1 [R=301,L]
+Force HTTPS Access
+
+# Always use https for secure connections
+# Replace 'www.example.com' with your domain name
+# (as it appears on your SSL certificate)
+RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://www.example.com/$1 [R=301,L]
+Block Multiple Referrers Traffic
+
+# Block traffic from multiple referrers
+RewriteEngine on
+Options +FollowSymlinks
+RewriteCond %{HTTP_REFERER} badsite\.com [NC,OR]
+RewriteCond %{HTTP_REFERER} badforum\.com [NC,OR]
+RewriteCond %{HTTP_REFERER} badsearchengine\.com [NC]
+RewriteRule .* - [F]
+Deny File Type Access
+
+#Do not allow these file types to be called
+RewriteEngine on
+RewriteRule .*\.(jpg|jpeg|gif|png|bmp|exe|swf)$ - [F,NC]
+Remove Index
+
+Options +FollowSymLinks -MultiViews -indexes
+RewriteEngine On
+RewriteBase /
+# remove index
+RewriteCond %{THE_REQUEST} /index(\.php)?[\s?/] [NC]
+RewriteRule ^(.*?)index(/|$) /$1 [L,R=301,NC,NE]
+Remove .php
+
+Options +FollowSymLinks -MultiViews -indexes
+RewriteEngine On
+RewriteBase /
+# remove .php; use THE_REQUEST to prevent infinite loops
+RewriteCond %{THE_REQUEST} ^GET\ (.*)\.php\ HTTP
+RewriteRule (.*)\.php$ $1 [L,R=301]
+Remove Index and /
+
+Options +FollowSymLinks -MultiViews -indexes
+RewriteEngine On
+RewriteBase /
+# remove index
+RewriteRule (.*)/index$ $1/ [R=302]
+# remove slash if not directory
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} /$
+RewriteRule (.*)/ $1 [R=301,L]
+Add .php To Access a File Without Redirecting
+
+Options +FollowSymLinks -MultiViews -indexes
+RewriteEngine On
+RewriteBase /
+# add .php to access file, but don't redirect
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule (.*) $1.php [L]
+ 
